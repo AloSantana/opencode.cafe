@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
+import { useState } from "react"
 import { Authenticated, Unauthenticated, useQuery } from "convex/react"
 
 import { api } from "@/convex/_generated/api"
@@ -9,6 +10,34 @@ import { EXTENSION_TYPES, HOMEPAGE_CATEGORIES } from "@/lib/constants"
 import type { ExtensionType } from "@/lib/constants"
 import { Badge } from "@/components/ui/badge"
 import { Header } from "@/components/header"
+
+function InstallCommand() {
+  const [copied, setCopied] = useState(false)
+  const command = "curl -fsSL https://opencode.ai/install | bash"
+
+  function handleCopy() {
+    navigator.clipboard.writeText(command).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }).catch(() => {
+      // Fallback: silently ignore clipboard errors
+    })
+  }
+
+  return (
+    <div className="flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-weak)] px-4 py-3">
+      <span className="select-none text-[var(--color-text-weaker)]">$</span>
+      <code className="flex-1 text-sm text-[var(--color-text)]">{command}</code>
+      <button
+        onClick={handleCopy}
+        className="shrink-0 rounded px-2 py-1 text-xs text-[var(--color-text-weak)] transition-colors hover:bg-[var(--color-bg-weak-hover)] hover:text-[var(--color-text)]"
+        aria-label="Copy install command"
+      >
+        {copied ? "Copied!" : "Copy"}
+      </button>
+    </div>
+  )
+}
 
 function ExtensionCard({ extension }: { extension: {
   productId: string
@@ -153,6 +182,7 @@ export default function Home() {
                 A cozy corner of the internet where developers share extensions, plugins, 
                 and tools for OpenCode. Pull up a chair and explore what the community has brewed.
               </p>
+              <InstallCommand />
               <div className="flex flex-col gap-4 pt-4 sm:flex-row">
                 <a
                   href="#extensions"
